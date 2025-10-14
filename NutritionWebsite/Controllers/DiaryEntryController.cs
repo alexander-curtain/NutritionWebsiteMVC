@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NutritionWebsite.data;
 using NutritionWebsite.Models;
 
 namespace NutritionWebsite.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class DiaryEntryController : Controller
     {
         private readonly ApplicationDbContext _db;

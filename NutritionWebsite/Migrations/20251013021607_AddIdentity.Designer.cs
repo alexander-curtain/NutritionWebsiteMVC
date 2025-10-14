@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutritionWebsite.data;
 
@@ -11,9 +12,11 @@ using NutritionWebsite.data;
 namespace NutritionWebsite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251013021607_AddIdentity")]
+    partial class AddIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,7 +245,7 @@ namespace NutritionWebsite.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DiaryEntries", (string)null);
+                    b.ToTable("DiaryEntries");
 
                     b.HasData(
                         new
@@ -420,7 +423,7 @@ namespace NutritionWebsite.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients", (string)null);
+                    b.ToTable("Ingredients");
                 });
 
             modelBuilder.Entity("NutritionWebsite.Models.UnitsConversion", b =>
@@ -441,7 +444,7 @@ namespace NutritionWebsite.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UnitsConversion", (string)null);
+                    b.ToTable("UnitsConversion");
 
                     b.HasData(
                         new
