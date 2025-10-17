@@ -13,6 +13,9 @@ namespace NutritionWebsite.data
 
         public DbSet<DiaryEntry> DiaryEntries { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
+        public DbSet<Meals> Meals { get; set; }
+        public DbSet<MealIngredients> MealIngredients { get; set; }
+    
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

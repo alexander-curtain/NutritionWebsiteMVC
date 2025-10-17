@@ -10,10 +10,6 @@
     </li>
     @if (SignInManager.IsSignedIn(User))
     {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index">Profile</a>
-        </li>
-
         @if (User.IsInRole("Admin"))
         {
             <li class="nav-item">
@@ -22,10 +18,10 @@
         } 
     }
     <li class="nav-item">
-        <a class="nav-link text-light" asp-area="" asp-controller="MealPlanning" asp-action="">Plan</a>
+        <a class="nav-link text-light" asp-area="" asp-controller="MealPlanning" asp-action="Planning">Plan</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-light" asp-area="" asp-controller="MealPlanning" asp-action="">Graph</a>
+        <a class="nav-link text-light" asp-area="" asp-controller="MealPlanning" asp-action="Graph">Graph</a>
     </li>
     
     

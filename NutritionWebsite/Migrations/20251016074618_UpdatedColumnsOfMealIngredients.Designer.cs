@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NutritionWebsite.data;
 
@@ -11,9 +12,11 @@ using NutritionWebsite.data;
 namespace NutritionWebsite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251016074618_UpdatedColumnsOfMealIngredients")]
+    partial class UpdatedColumnsOfMealIngredients
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -450,8 +453,6 @@ namespace NutritionWebsite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IngredientId");
-
                     b.HasIndex("MealId");
 
                     b.ToTable("MealIngredients");
@@ -466,6 +467,10 @@ namespace NutritionWebsite.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("MealName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Unit")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -792,7 +797,7 @@ namespace NutritionWebsite.Migrations
                 {
                     b.HasOne("NutritionWebsite.Models.Ingredient", "Ingredient")
                         .WithMany()
-                        .HasForeignKey("IngredientId")
+                        .HasForeignKey("MealId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
