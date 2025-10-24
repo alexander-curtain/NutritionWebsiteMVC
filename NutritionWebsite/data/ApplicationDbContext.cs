@@ -15,6 +15,7 @@ namespace NutritionWebsite.data
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<Meals> Meals { get; set; }
         public DbSet<MealIngredients> MealIngredients { get; set; }
+        public DbSet<UsersMeals> UsersMeals { get; set; }
     
 
 
@@ -22,6 +23,11 @@ namespace NutritionWebsite.data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Meals>()
+                .HasMany(m => m.Ingredients)
+                .WithOne(i => i.Meal)
+                .HasForeignKey(i => i.MealId)
+                .OnDelete(DeleteBehavior.Cascade); // optional: removes ingredients when meal is deleted
 
             modelBuilder.Entity<DiaryEntry>().HasData(
                 new DiaryEntry { Id = 1, Title = "Went Hiking", Description = "hated it", Created = new DateTime(2025, 10, 3) },

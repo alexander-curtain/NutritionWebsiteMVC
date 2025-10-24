@@ -1,25 +1,153 @@
-﻿@model List<Meals>
+﻿@using NutritionWebsite.Controllers
+@model (List<MealViewModel> planned, List<Meals> meals)
 
 <div class="container">
+
+
+    <!-- Modal For Adding new Meal to the Plan-->
+    <div class="modal fade" id="myModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalMealName"> Meal Name Here </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form asp-action="addPlannedMeal" method="post">
+                    <div class="modal-body">
+                        <p>Select when you plan to eat the meal</p>
+                        <input type="date" name="planned" />
+                        <!-- TODO Add Calander here and form -->
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="justify-content-between">
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+
+                    <input type="hidden" name="mealId" id="mealIdInput" />
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--TODO Add modal for quick viewing of the meals (for nutrients etc) with edit button on modal-->
+    
+    <!-- Main Card -->
     <div class="row ">
-        <div class="card bg-primary-subtle">
+        <div class="card ">
             <div class="card-header bg-primary">
                 <div class="d-flex justify-content-between">
                     <h1>Planned Meals</h1>
                     <button class="btn btn-secondary">Filter [s]</button>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body ">
+
                 
-                @if(Model.Count == 0)
+                <!-- Left Hand Side (meal timeline) -->
+                @if (Model.meals.Count == 0) // if the user hasn't defined a meal prompts them to create one.
                 {
                     <p>You Have no Meals Saved. Get Started Here! -> <a asp-action="Create" class="btn btn-primary">Add [+]</a></p>
-                } else
-                {
-                    <p> Need a new type of Meal? -> <a asp-action="Create" class="btn btn-primary">Add [+]</a></p>
-                    // add list item here once there is an item
+                } else {
+                    <div class="d-flex justify-content-end mb-3">
+                        <a asp-action="Create" class="btn btn-primary">Add MealType [+]</a>
+                    </div>
 
-                    <h1> WIP not added yet</h1>
+
+                    <div class="d-flex justify-content-between">
+                        <table class="table">
+
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Planned Meal</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.planned.Count > 0)
+                                    {
+                                        @foreach (var m in Model.planned)
+                                        {
+                                            <tr>
+                                                <td>@m.MealName</td>
+                                                <td>@m.Planned</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Add Reminder to the user to set time to eat
+                                        <tr>
+                                            <td> Add a meal to the plan! </td>
+                                            <td class="text-bg-info"> -> </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+
+                            </table>
+
+                        <span class=" d-block bg-black" style="height: 100%; width: 1%;"></span>
+
+                        <!-- Right hand side, List of Meals you have saved -->
+                            <table class="table">
+
+                                <thead class="head bg-light-subtle">
+                                    <tr>
+                                        <th>Meal</th>
+                                        <th>Add #</th>
+                                        <th>Edit/Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var m in Model.meals)
+                                    { // TODO Add view Action
+                                      <tr>
+                                          <td>@m.MealName</td>
+                                          <td>
+                                          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"
+                                                  onclick="updateModalForModel('@m.MealName', '@m.Id')">
+                                              Add
+                                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                                                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+                                              </svg>
+                                          </button>                                              
+                                          </td>
+                                         
+                                          
+                                          <td>
+                                          <div class="d-flex justify-content-between">
+                                            <form asp-action="AddIngredients" method="post">
+                                                <input type="hidden" name="id" value="@m.Id" />
+                                                <button class="btn btn-secondary">View/Edit</button>
+                                            </form>
+
+                                            <form asp-action="CancelMeal" method="post">
+                                                <input type="hidden" name="id" value="@m.Id" />
+                                                    <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure you want to delete? This action cannot be undone.');">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                          </div>
+                                          </td>
+                                            
+                                      </tr>
+                                    }
+                                </tbody>
+                            </table>
+                       
+                    </div>
+                    
                 }
             </div>
         </div>
@@ -29,4 +157,23 @@
             <a class="btn btn-primary">See Graph [->]</a>
         </div>
     </div>
+
 </div>
+
+@section Scripts {
+    <script>
+
+        function updateModalForModel(title, mealId) {
+
+            document.getElementById('modalMealName').textContent  = title;
+
+            document.getElementById('mealIdInput').value = mealId;
+        }
+
+        window.onload  = function() {
+            console.log(@Html.Raw(Json.Serialize(Model.meals)));
+            console.log(@Html.Raw(Json.Serialize(Model.planned)));
+        }
+
+    </script>
+}

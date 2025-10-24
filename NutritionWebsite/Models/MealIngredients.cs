@@ -18,8 +18,6 @@ namespace NutritionWebsite.Models
 
         [ForeignKey("IngredientId")]
         public required Ingredient Ingredient { get; set; } // navigation property
-
-        public string MealName { get; set; } = string.Empty;
         public float Quantity { get; set; }
         public string Unit { get; set; } = string.Empty;
 

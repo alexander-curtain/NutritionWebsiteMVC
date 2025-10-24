@@ -4,11 +4,10 @@ namespace NutritionWebsite.Models
 {
     public class UnitsConversion
     {
-        public int Id { get; set; }
+        public int Id {  get; set; }
         [Required]
-        public string Nutrient { get; set; } = string.Empty;
+        public string Nutrient { get; set; }
         [Required]
-        public string Unit { get; set; } = string.Empty;
+        public string Unit { get; set; }
     }
 }
-
