@@ -1,0 +1,138 @@
+﻿@model (Ingredient item, Ingredient DRI)
+
+
+
+
+<div class="split-container">
+    <div class="left-side">
+        <h5>Daily Recommended Intake</h5>
+        <p>Click elements header in the pie chart to remove them!</p>
+
+        @* Render partial once on left *@
+        @await Html.PartialAsync("_nutrientPiePartial", Model.DRI, 
+            new ViewDataDictionary(ViewData) { ["Prefix"] = "DRI" });
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="right-side">
+        
+        <h5>Find Item to Compare!</h5>
+        <p id="SearchModeText"> Select Meals or Ingredients: </p>
+        <select id ="searchMode" class="form-select-sm">
+            <option value=""></option>
+            <option value="Meals">Meals</option>
+            <option value="Ingredients">Ingredients</option>
+        </select>
+
+        <input class="mb-3" id="search" type="text" placeholder="⌕" />
+        <div id="searchResults"></div>
+        <p id="junk"></p>
+
+        <form method="post" asp-action="SingleItem">
+            <input id="MealId" type="hidden" value="" />
+
+        </form>
+        @if (Model.item != null)
+        {
+            
+            <h5>Summary of @Model.item.NamePrimary</h5>
+            @* Render partial once on Right *@
+            @await Html.PartialAsync("_HistogramPartial", (Model.item, Model.DRI),
+            new ViewDataDictionary(ViewData) { ["Prefix"] = "item" })
+                ;
+        }
+
+
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+<script>
+
+
+    $('#search').on('input', function () {
+        const inputVal = $(this).val();
+        const searchMode = $('#searchMode').val(); // 'Meal' or 'Ingredients'
+
+
+        const searchUrl = '@Url.Action("Search")';
+
+        if (searchMode !== '') {
+            document.getElementById('SearchModeText').classList.remove("text-danger");
+
+            $.ajax({
+                type: 'POST',
+                url: searchUrl,
+                data: { search: inputVal, type: searchMode.charAt(0) }, // 'M' or 'I'
+                success: function (results) {
+                    var $resultsContainer = $('#searchResults');
+                    $resultsContainer.empty();
+
+                    results.forEach(function (item) {                        
+                        var $button = $('<button>')      
+                                .text(item.name)                
+                                .attr('data-id', item.id)        
+                                .attr('data-type', item.type)
+                                .addClass('btn btn-secondary m-1')
+                                .on('click', function() {
+
+                            console.log('@Url.Action("SingleItem")?id=' + item.id + '&type=' + item.type)
+                            window.location.href = '@Url.Action("SingleItem")?id=' + item.id + '&type=' + item.type;
+
+
+                        });
+
+                        // Append to container
+                        $resultsContainer.append($button);
+
+                    });
+                }
+            });
+
+        } else {
+            document.getElementById('SearchModeText').classList.add("text-danger");
+        }
+    });
+</script>
+
+
+<style>
+    /* use the robust CSS from above */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+
+    .split-container {
+        display: flex;
+        height: calc(100vh - 60px);
+    }
+
+    .left-side, .right-side {
+        flex: 1 1 50%;
+        min-width: 0;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .divider {
+        width: 2px;
+        background: #ccc;
+        align-self: stretch;
+    }
+
+    /* keep canvases responsive */
+    canvas {
+        max-width: 100%;
+        height: auto !important;
+        display: block;
+    }
+</style>

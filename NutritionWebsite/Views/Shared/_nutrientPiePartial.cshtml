@@ -1,0 +1,179 @@
+﻿@model Ingredient
+@{
+    var prefix = ViewData["Prefix"] ?? "";
+}
+
+<div class="row align-content-center">
+    <div class="row">
+        <hr />
+        <h5>General Caloric Intake by Grams</h5>
+        <p>Calories: @Model.Energy Kilo-Joules</p>
+        <p>Water: @Model.Moisture g</p>
+        <canvas id="@prefix-caloricIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+    </div>
+    <div class="row">
+        <hr />
+        <h5>Maximum Recommended Consumption of Fats</h5>
+        <canvas id="@prefix-fatIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+    </div>
+    <div class="row">
+        <hr />
+        <h5>Recommened Vitamin Intake </h5>
+        <h6>(milligrams)</h6>
+        <canvas id="@prefix-vitaminMilligramIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+
+        <h6>(micrograms)</h6>
+        <canvas id="@prefix-vitaminMicroIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+        
+    </div>
+    <div class="row">
+        <hr />
+        <h5>Recommened Mineral Intake </h5>
+        <p>Note if Mineral is not present or 0 it is likely understudied. Please consolidate current research if concerned about intake.</p>
+        <h6>(Milligrams)</h6>
+        <canvas id="@prefix-mineralMilliIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+
+        <h6>(Micrograms)</h6>
+        <canvas id="@prefix-mineralMicroIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+
+
+    function createPieChart(canvasId, labels, values, colours){
+        new Chart(canvasId, {
+            type: "pie",
+            data: {
+                labels: labels,
+                datasets: [{
+                        backgroundColor: colours,
+                        data: values
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "pi chart"
+                }
+            }
+        });
+    }
+
+    // Caloric  Values:
+    var CaloricId = "@prefix-caloricIntakeRecommendations";
+    var CaloricLabels = ["Total Fat @Model.FatTotal (g)", "Total Starch @Model.TotalStarch (g)", "Total Sugar @Model.TotalSugar (g)", "Dietary Fibre @Model.DietaryFibre (g)", "Protein @Model.Protein (g)"];
+    var CaloricValues = [
+        @Model.FatTotal.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.TotalStarch.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.TotalSugar.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.DietaryFibre.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Protein.ToString(System.Globalization.CultureInfo.InvariantCulture)
+    ];
+    var CaloricColors = ["#ffea00", "#ffbf00", "#0080ff", "#40ff00", "#8000ff"];
+    createPieChart(CaloricId, CaloricLabels, CaloricValues, CaloricColors);
+
+    // Fat  Values:
+    var FatId = "@prefix-fatIntakeRecommendations"
+    var fatLabels = ["Trans Fat @Model.TotalTransFat (g)", "Saturated Fat @Model.TotalSaturatedFat (g)", "Monounsaturated Fat @Model.TotalMonounsaturatedFat (g)", "Polyunsaturated Fat @Model.TotalPolyunsaturatedFat (g)"]
+    var fatValues = [
+        @Model.TotalTransFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.TotalSaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.TotalMonounsaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.TotalPolyunsaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var fatColors = ["#ff00aa", "#ffea00", "#1500ff", "#15ff00"];
+    createPieChart(FatId, fatLabels, fatValues, fatColors);
+
+    // milligram vitamins values:
+    var milliVitaminId = "@prefix-vitaminMilligramIntakeRecommendations"
+    var milliVitaminLabels = ["Vitamin B1 @Model.VitaminB1 (mg)", "Vitamin B2 @Model.VitaminB2 (mg)", "Vitamin B3 @Model.VitaminB3 (mg)", "Vitamin B4 @Model.NiacinEquivalents  (Niacin mg)", "Vitamin B5 @Model.VitaminB5 (mg)", "Vitamin B6 @Model.VitaminB6 (mg)", "Vitamin C @Model.VitaminC (mg)", "Vitamin E @Model.VitaminE (mg)"]
+    var milliVitaminValues = [
+        @Model.VitaminB1.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.VitaminB2.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.VitaminB3.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.NiacinEquivalents.ToString(System.Globalization.CultureInfo.InvariantCulture),
+         @Model.VitaminB5.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.VitaminB6.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.VitaminC.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.VitaminE.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var vitaminMilliColors = ["#00ffff", "#0095ff", "#0040ff", "#1500ff", "#8000ff", "#d400ff", "#ffaa00", "#40ff00"];
+    createPieChart(milliVitaminId, milliVitaminLabels, milliVitaminValues, vitaminMilliColors)
+
+    // microgram vitamins values:
+    var microVitaminId = "@prefix-vitaminMicroIntakeRecommendations";
+    var microVitaminLabels = ["Vitamin A @Model.VitaminAequivalent (µg)", "Vitamin B7 @Model.VitaminB7 (µg)", "Vitamin @Model.VitaminB12 B12 (µg)", "Folate @Model.FolicAcidEquivalents (µg)"]
+    var microVitaminValues = [
+        @Model.VitaminAequivalent.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.VitaminB7.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.VitaminB12.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.FolicAcidEquivalents.ToString(System.Globalization.CultureInfo.InvariantCulture)
+    ]
+    var vitaminMicroColors = ["#ffea00", "#002aff", "#ff00ff", "#737373"];
+    createPieChart(microVitaminId, microVitaminLabels, microVitaminValues, vitaminMicroColors);
+
+    //Milligram Minerals values:
+    var milliMineralsId = "@prefix-mineralMilliIntakeRecommendations";
+    var milliMineralsLabels = ["Calcium @Model.Calcium (mg)", "Chloride @Model.Chloride (mg)", "Copper @Model.Copper (mg)", "Iron @Model.Iron (mg)", "Magnesium @Model.Magnesium (mg)", "Manganese @Model.Manganese (mg)", "Phosphorus @Model.Phosphorus (mg)", "Potassium @Model.Potassium (mg)", "Sodium @Model.Sodium (mg)", "Sulphur @Model.Sulphur (mg)", "Zinc @Model.Zinc (mg)" ]
+    var milliMineralsValues = [
+        @Model.Calcium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Chloride.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Copper.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Iron.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Magnesium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Manganese.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Phosphorus.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Potassium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Sodium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Sulphur.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Zinc.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var milliMineralsColors = ["#e6e6e6", "#d4ff00", "#ff9500", "#ffea00", "#ff00ff", "#ff4000", "#ffff00", "#2b00ff", "#ff0055", "#ffff00", "#808080"];
+    createPieChart(milliMineralsId, milliMineralsLabels, milliMineralsValues, milliMineralsColors)
+
+    // micro minerial values:
+    var microMineralsId = "@prefix-mineralMicroIntakeRecommendations";
+    var microMineralsLabels = ["Chromium @Model.Chromium (µg)", "Cobalt @Model.Cobalt (µg)", "Fluoride @Model.Fluoride (µg)", "Iodine @Model.Iodine (µg)", "Lead @Model.Lead (µg)", "Mercury @Model.Mercury (µg)", "Molybdenum @Model.Molybdenum (µg)", "Nickel @Model.Nickle (µg)", "Selenium @Model.Selenium (µg)", "Tin @Model.Tin (µg)"];
+    var microMineralsValues = [
+        @Model.Chromium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Cobalt.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Fluoride.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Iodine.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Lead.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Mercury.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Molybdenum.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Nickle.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Selenium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.Tin.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var microMineralsColors = ["#cccccc", "#0000ff", "#00eaff", "#ff8000", "#750080", "#333333", "#0095ff", "#ffd500", "#00ff00", "#808080"];
+    createPieChart(microMineralsId, microMineralsLabels, microMineralsValues, microMineralsColors)
+
+
+
+</script>
+
+
+<style>
+    .split-container {
+        display: flex;
+        height: 100vh; /* full screen height */
+    }
+
+    .left-side, .right-side {
+        flex: 1; /* each side takes up half of the screen */
+        padding: 20px;
+        overflow-y: auto; /* allow scrolling if content is tall */
+    }
+
+    .divider {
+        width: 2px;
+        background-color: #ccc; /* light gray line */
+        height: auto;
+    }
+</style>

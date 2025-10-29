@@ -90,6 +90,7 @@ namespace NutritionWebsite.data
 
         public void SeedFromExcel(string filePath)
         {
+            // Comment this out to reinject all the ingredients from excel
             if (Ingredients.Any()) return; // Avoid duplicates
 
             var data = ExcelSeeder.LoadIngredientsFromExcel(filePath);

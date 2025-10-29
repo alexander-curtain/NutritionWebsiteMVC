@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using NutritionWebsite.data;
 using NutritionWebsite.Models;
 
@@ -45,6 +46,7 @@ namespace NutritionWebsite.Controllers
                 .Where(m => m.UserId == userID)
                 .ToList();
 
+            // TODO sort the userMeals based on datetime.
             return View((usersMeals, Meals));
         }
 
@@ -67,11 +69,6 @@ namespace NutritionWebsite.Controllers
             return RedirectToAction("Planning");
         }
 
-
-        public IActionResult Graph()
-        {
-            return View();
-        }
 
         public async Task<IActionResult> AddIngredients(int id)
         {
@@ -96,8 +93,15 @@ namespace NutritionWebsite.Controllers
                 return Json(Enumerable.Empty<string>());
 
             var results = _db.Ingredients
-                .Where(s => (s.NamePrimary).Contains(search))
-                .Select(s => "[" + s.NamePrimary + s.NameSecondary + "]" )
+                .Where(s => (s.NamePrimary + s.NameSecondary).Contains(search))
+                .Select(s => new
+                {
+                    name = "[" + s.NamePrimary + s.NameSecondary + "]",
+                    id = s.Id
+                })
+                .OrderBy(s => !s.name.StartsWith(search))  // true (non-match) comes after false (match)
+                .ThenBy(s => s.name.IndexOf(search))       // earlier matches rank higher
+                .ThenBy(s => s.name)                   // tie-break alphabetically
                 .Take(15)
                 .ToList();
 
@@ -141,11 +145,11 @@ namespace NutritionWebsite.Controllers
 
 
         [HttpPost]
-        public IActionResult AddIngredientToMeal(string ingredientName, float quantity, string unit, int mealId)
+        public IActionResult AddIngredientToMeal(int ingredientId, float quantity, string unit, int mealId)
         {
             // validation scripts
-            if (ingredientName == "")
-                ModelState.AddModelError("ingredientName", "Must Contain a valid ingredient");
+            if (ingredientId == null || ingredientId < 1)
+                ModelState.AddModelError("ingredientId", "No Ingredient Selected");
             if (quantity <= 0)
                 ModelState.AddModelError("quantity", "Quantity must be greater than 0.");
             if (false) // add a list of valid units
@@ -156,11 +160,6 @@ namespace NutritionWebsite.Controllers
                 // Re-display the same view (still just passing the mealId)
                 return View("AddIngredients", mealId);
             }
-            var id = _db.Ingredients.Where(s => s.NamePrimary == ingredientName).ToList();
-            if (id == null)
-            {
-                return NotFound();
-            }
 
             Meals meal = _db.Meals.Find(mealId);
             if (meal == null)
@@ -168,11 +167,8 @@ namespace NutritionWebsite.Controllers
                 return NotFound();
             }
 
-            // for now we Dump the list and take the top of the stack, will change later with use of search.
-            // TODO FIX MANY TO ONE RELATION WITH SEARCH
-            int selected_id = id.FirstOrDefault().Id;
 
-            Ingredient ingredient = _db.Ingredients.Find(selected_id); // no null check needed since this has already been selected from the table.
+            Ingredient ingredient = _db.Ingredients.FirstOrDefault(m => m.Id == ingredientId); // no null check needed since this has already been selected from the table.
 
             var newMealIngredient = new MealIngredients
             {
@@ -181,7 +177,7 @@ namespace NutritionWebsite.Controllers
                 Quantity = quantity,
                 Unit = unit,
                 Ingredient = ingredient,
-                IngredientId = selected_id
+                IngredientId = ingredientId
             };
 
             _db.MealIngredients.Add(newMealIngredient);

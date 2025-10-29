@@ -34,7 +34,9 @@
 
 				<div asp-validation-summary="All" class="text-danger"></div>
 
-				<input type="text" id="ingredientName" name="ingredientName" placeholder="Search to add" class="mb-3 bg-body-secondary" readonly />
+				<input type="text" id="ingredientName" placeholder="Search to add" class="mb-3 bg-body-secondary" readonly />
+
+				<input type="hidden" id="ingredientId" name="ingredientId" />
 
 				<div class="row justify-content-between mb-3">
 					<div class="column">
@@ -57,7 +59,7 @@
 			</form>
 			<div class="row flex-row">
 				<div class="justify-content-between d-flex ">
-					<form asp-action="CancelMeal" method="post">
+					<form asp-action="" method="post">
 						<a asp-action="FinaliseMeal" class="btn btn-primary">
 							Save
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
@@ -67,7 +69,6 @@
 							
 						</a>
 						<input type="hidden" name="id" value="@Model" />
-						<button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete? This action cannot be undone.');">Delete?</button>
 					</form>
 
 				</div>
@@ -113,10 +114,12 @@
 					results.forEach(function (item) {
 						var $button = $('<button>')
 							.addClass('btn btn-secondary m-1') // Bootstrap styling (optional)
-							.text(item)
+							.text(item.name)
 							.on('click', function () {
+								console.log(item.id);
+								$('#ingredientName').val((item.name.replace('[','').split(','))[0]);//
 
-								$('#ingredientName').val((item.replace('[','').split(','))[0]);
+								$('#ingredientId').val(item.id);
 
 								//add hidden input which takes in the values of the secondary qualities
 								$resultsContainer.empty();

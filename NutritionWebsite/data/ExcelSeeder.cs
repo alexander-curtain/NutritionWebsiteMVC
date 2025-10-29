@@ -85,8 +85,10 @@ namespace NutritionWebsite.Data
                         VitaminB6 = ParseDecimal(row[91]),
                         VitaminB7 = ParseDecimal(row[92]),
                         VitaminB12 = ParseDecimal(row[93]),
-                        VitaminC = ParseDecimal(row[101]),
-                        VitaminE = ParseDecimal(row[110])
+                        FolicAcidEquivalents = ParseDecimal(row[97]),
+                        VitaminC = ParseDecimal(row[98]),
+                        VitaminE = ParseDecimal(row[112]),
+                       
                     };
 
 

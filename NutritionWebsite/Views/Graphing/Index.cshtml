@@ -1,0 +1,36 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+<div class="modal fade modal-static" id="SelectionModal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5> Please Select </h5>
+            </div>
+            <div class="modal-body">
+                <p5> View Single Ingredient or Timeline?</p5>
+            </div>
+            <div class="modal-footer">
+                <div class="row d-flex justify-content-around">
+                    <div class="column">
+                        <a class="btn btn-primary">Timeline</a>
+                        <a class="btn btn-primary" asp-action="SingleItem">Single Item</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+     document.addEventListener("DOMContentLoaded", function() {
+      var selectionModal = new bootstrap.Modal(document.getElementById('SelectionModal'));
+      selectionModal.show();
+    });
+</script>

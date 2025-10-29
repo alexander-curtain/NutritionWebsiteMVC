@@ -1,0 +1,259 @@
+﻿@model (Ingredient item, Ingredient dri)
+@{
+    var prefix = ViewData["Prefix"] ?? "";
+}
+
+<div class="row align-content-center">
+    <div class="row">
+        <hr />
+        <h5>General Caloric Intake by Grams</h5>
+        <p>Calories: @Model.item.Energy Kilo-Joules
+           Percentage of daily calories: @( ((float)Model.item.Energy / (float)Model.dri.Energy) * 100 )%</p>
+        <p>Water: @Model.item.Moisture g</p>
+        <canvas id="@prefix-caloricIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+    </div>
+    <div class="row">
+        <hr />
+        <h5>Maximum Recommended Consumption of Fats</h5>
+        <canvas id="@prefix-fatIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+    </div>
+    <div class="row">
+        <hr />
+        <h5>Vitamin Intake </h5>
+        <h6>(milligrams)</h6>
+        <canvas id="@prefix-vitaminMilligramIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+
+        <h6>(micrograms)</h6>
+        <canvas id="@prefix-vitaminMicroIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+
+    </div>
+    <div class="row">
+        <hr />
+        <h5>Recommened Mineral Intake </h5>
+        <p>Note if Mineral is not present or 0 it is likely understudied. Please consolidate current research if concerned about intake.</p>
+        <h6>(Milligrams)</h6>
+        <canvas id="@prefix-mineralMilliIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+
+        <h6>(Micrograms)</h6>
+        <canvas id="@prefix-mineralMicroIntakeRecommendations" style="width:100%;max-width:600px;max-height:400px;"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+        function createStackedBarChart(canvasId, labels, itemValues, driValues, colours) {
+        new Chart(document.getElementById(canvasId), {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "@Model.item.NamePrimary",
+                        backgroundColor: colours,
+                        data: itemValues
+                    },
+                    {
+                        label: "DRI",
+                        backgroundColor: "#bfbfbf",
+                        data: driValues
+                    } 
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: false
+                    },
+                    y: {
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: true
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Example: Caloric chart
+    var CaloricId = "@prefix-caloricIntakeRecommendations";
+    var CaloricLabels = ["Total Fat", "Total Starch", "Total Sugar", "Dietary Fibre", "Protein"];
+    var CaloricItemValues = [
+        @Model.item.FatTotal.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.TotalStarch.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.TotalSugar.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.DietaryFibre.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Protein.ToString(System.Globalization.CultureInfo.InvariantCulture)
+    ];
+    var CaloricDriValues = [
+        @Model.dri.FatTotal.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.TotalStarch.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.TotalSugar.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.DietaryFibre.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Protein.ToString(System.Globalization.CultureInfo.InvariantCulture)
+    ];
+    var CaloricColors = ["#ffea00", "#ffbf00", "#0080ff", "#40ff00", "#8000ff"];
+    createStackedBarChart(CaloricId, CaloricLabels, CaloricItemValues, CaloricDriValues, CaloricColors);
+
+    // Fat  Values:
+    var FatId = "@prefix-fatIntakeRecommendations"
+    var fatLabels = ["Trans Fat @Model.item.TotalTransFat (g)", "Saturated Fat @Model.item.TotalSaturatedFat (g)", "Monounsaturated Fat @Model.item.TotalMonounsaturatedFat (g)", "Polyunsaturated Fat @Model.item.TotalPolyunsaturatedFat (g)"]
+    var fatValues = [
+        @Model.item.TotalTransFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.TotalSaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.TotalMonounsaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.TotalPolyunsaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var fatDriValues = [
+        @Model.dri.TotalTransFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.TotalSaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.TotalMonounsaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.TotalPolyunsaturatedFat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var fatColors = ["#ff00aa", "#ffea00", "#1500ff", "#15ff00"];
+    createStackedBarChart(FatId, fatLabels, fatValues, fatDriValues, fatColors);
+
+    // milligram vitamins values:
+    var milliVitaminId = "@prefix-vitaminMilligramIntakeRecommendations"
+    var milliVitaminLabels = ["Vitamin B1 @Model.item.VitaminB1 (mg)", "Vitamin B2 @Model.item.VitaminB2 (mg)", "Vitamin B3 @Model.item.VitaminB3 (mg)", "Vitamin B4 @Model.item.NiacinEquivalents  (Niacin mg)", "Vitamin B5 @Model.item.VitaminB5 (mg)", "Vitamin B6 @Model.item.VitaminB6 (mg)", "Vitamin C @Model.item.VitaminC (mg)", "Vitamin E @Model.item.VitaminE (mg)"]
+    var milliVitaminValues = [
+        @Model.item.VitaminB1.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.VitaminB2.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.VitaminB3.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.NiacinEquivalents.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.VitaminB5.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.VitaminB6.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.VitaminC.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.VitaminE.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+        var milliVitaminValuesDRI = [
+        @Model.dri.VitaminB1.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.VitaminB2.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.VitaminB3.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.NiacinEquivalents.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.VitaminB5.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.VitaminB6.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.VitaminC.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.VitaminE.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var vitaminMilliColors = ["#00ffff", "#0095ff", "#0040ff", "#1500ff", "#8000ff", "#d400ff", "#ffaa00", "#40ff00"];
+    createStackedBarChart(milliVitaminId, milliVitaminLabels, milliVitaminValues, milliVitaminValuesDRI, vitaminMilliColors);
+
+
+    // microgram vitamins values:
+    var microVitaminId = "@prefix-vitaminMicroIntakeRecommendations";
+    var microVitaminLabels = ["Vitamin A @Model.item.VitaminAequivalent (µg)", "Vitamin B7 @Model.item.VitaminB7 (µg)", "Vitamin @Model.item.VitaminB12 B12 (µg)", "Folate @Model.item.FolicAcidEquivalents (µg)"]
+    var microVitaminValues = [
+        @Model.item.VitaminAequivalent.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.VitaminB7.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.VitaminB12.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.FolicAcidEquivalents.ToString(System.Globalization.CultureInfo.InvariantCulture)
+    ]
+        var microVitaminValuesDRI = [
+        @Model.dri.VitaminAequivalent.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.VitaminB7.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.VitaminB12.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.FolicAcidEquivalents.ToString(System.Globalization.CultureInfo.InvariantCulture)
+    ]
+    var vitaminMicroColors = ["#ffea00", "#002aff", "#ff00ff", "#737373"];
+    createStackedBarChart(microVitaminId, microVitaminLabels, microVitaminValues, microVitaminValuesDRI, vitaminMicroColors);
+
+
+    //Milligram Minerals values:
+    var milliMineralsId = "@prefix-mineralMilliIntakeRecommendations";
+    var milliMineralsLabels = ["Calcium @Model.item.Calcium (mg)", "Chloride @Model.item.Chloride (mg)", "Copper @Model.item.Copper (mg)", "Iron @Model.item.Iron (mg)", "Magnesium @Model.item.Magnesium (mg)", "Manganese @Model.item.Manganese (mg)", "Phosphorus @Model.item.Phosphorus (mg)", "Potassium @Model.item.Potassium (mg)", "Sodium @Model.item.Sodium (mg)", "Sulphur @Model.item.Sulphur (mg)", "Zinc @Model.item.Zinc (mg)" ]
+    var milliMineralsValues = [
+        @Model.item.Calcium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Chloride.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Copper.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Iron.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Magnesium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Manganese.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Phosphorus.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Potassium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Sodium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Sulphur.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Zinc.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var milliMineralsValuesDRI = [
+        @Model.dri.Calcium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Chloride.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Copper.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Iron.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Magnesium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Manganese.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Phosphorus.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Potassium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Sodium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Sulphur.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Zinc.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var milliMineralsColors = ["#e6e6e6", "#d4ff00", "#ff9500", "#ffea00", "#ff00ff", "#ff4000", "#ffff00", "#2b00ff", "#ff0055", "#ffff00", "#808080"];
+    createStackedBarChart(milliMineralsId, milliMineralsLabels, milliMineralsValues, milliMineralsValuesDRI, milliMineralsColors);
+
+    // micro minerial values:
+    var microMineralsId = "@prefix-mineralMicroIntakeRecommendations";
+    var microMineralsLabels = ["Chromium @Model.item.Chromium (µg)", "Cobalt @Model.item.Cobalt (µg)", "Fluoride @Model.item.Fluoride (µg)", "Iodine @Model.item.Iodine (µg)", "Lead @Model.item.Lead (µg)", "Mercury @Model.item.Mercury (µg)", "Molybdenum @Model.item.Molybdenum (µg)", "Nickel @Model.item.Nickle (µg)", "Selenium @Model.item.Selenium (µg)", "Tin @Model.item.Tin (µg)"];
+    var microMineralsValues = [
+        @Model.item.Chromium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Cobalt.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Fluoride.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Iodine.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Lead.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Mercury.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Molybdenum.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Nickle.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Selenium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.item.Tin.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+        var microMineralsValuesDRI = [
+        @Model.dri.Chromium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Cobalt.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Fluoride.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Iodine.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Lead.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Mercury.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Molybdenum.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Nickle.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Selenium.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        @Model.dri.Tin.ToString(System.Globalization.CultureInfo.InvariantCulture),
+    ]
+    var microMineralsColors = ["#cccccc", "#0000ff", "#00eaff", "#ff8000", "#750080", "#333333", "#0095ff", "#ffd500", "#00ff00", "#808080"];
+    createStackedBarChart(microMineralsId, microMineralsLabels, microMineralsValues, microMineralsValuesDRI, microMineralsColors);
+
+
+
+</script>
+
+
+<style>
+    .split-container {
+        display: flex;
+        height: 100vh; /* full screen height */
+    }
+
+    .left-side, .right-side {
+        flex: 1; /* each side takes up half of the screen */
+        padding: 20px;
+        overflow-y: auto; /* allow scrolling if content is tall */
+    }
+
+    .divider {
+        width: 2px;
+        background-color: #ccc; /* light gray line */
+        height: auto;
+    }
+</style>

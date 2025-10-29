@@ -1,29 +1,43 @@
 ﻿<div class="container mt-4">
-	<div class="row">
-		<div class="col-md-8 offset-md-2">
-			<div class="card">
-				<div class="card-header bg-primary text-white">
-					<h2>Name New Meal</h2>
-				</div>
-				<div class="card-body">
-					<form asp-action="Create" method="post">
-						<div class="form-group mb-3">
-							<label class="form-label">Meal Name: </label>
-							<input type="text" class="form-control" name="mealName" placeholder="Name of Meal" />
-						</div>
 
-						<div class="d-flex justify-content-between mb-3">
-							<button type="submit" class="btn btn-primary">Create</button>
-							<a asp-action="Planning" class="btn btn-danger">Cancel</a>"
-						</div>
-					</form>					
+</div>
+
+
+<div class="modal fade" id="CreateNewMealModal" data-bs-backdrop="static" data-bs-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-header bg-primary text-white">
+			<h2>Name New Meal</h2>
+		</div>
+
+		<div class="modal-content">
+
+			<form asp-action="Create" method="post">
+				<div class="modal-body">
+					<div class="form-group mb-3">
+						<label class="form-label">Meal Name: </label>
+						<input type="text" class="form-control" name="mealName" placeholder="Name of Meal" />
+					</div>
 				</div>
-			</div>
+
+				<div class="modal-footer">
+					<div class="d-flex justify-content-between mb-3">
+						<button type="submit" class="btn btn-primary">Create</button>
+						<a asp-action="Planning" class="btn btn-danger">Cancel</a>"
+					</div>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
 
 
+
+<script>
+	 document.addEventListener("DOMContentLoaded", function() {
+	  var selectionModal = new bootstrap.Modal(document.getElementById('CreateNewMealModal'));
+	  selectionModal.show();
+	});
+</script>
 @section Scripts {
 	<partial name="_ValidationScriptsPartial" />
 }
